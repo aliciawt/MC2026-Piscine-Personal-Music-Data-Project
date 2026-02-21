@@ -1,8 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Data Project</title>
     <script type="module" src="script.mjs"></script>
   </head>
+
   <body>
+    <main>
+      <h1>My Music Data</h1>
+
+      <div>
+        <label for="user-dropdown">Select user: </label>
+        <select id="user-dropdown"></select>
+      </div>
+
+      <div id="music-data">
+        <section id="most-listened-song" class="number">
+          <p>The song you listened to the most is </p>
+          <p><!--You listened to this song xxx times--></p>
+        </section>
+        <section id="most-listened-artist" class="number">
+          <p>The artist you listened to the most is </p>
+          <p><!--You listened to this artist xxx times--></p>
+        </section>
+        <section id="most-listened-song-Friday" class="number">
+          <p>The song you listened to the most on Friday nights (between 5pm and 4am) is </p>
+          <p><!--You listened to this song xxx times on Friday nights--></p>
+        </section>
+        <section id="most-listened-song-v2" class="length">
+          <p>The song you listened to the longest is </p>
+          <p><!--You listened to this song for xxx minutes--></p>
+        </section>
+        <section id="most-listened-artist-v2" class="length">
+          <p>The artist you listened to the longest is </p>
+          <p><!--You listened to this artist for xxx minutes--></p>
+        </section>
+        <section id="most-listened-song-Friday-v2" class="length">
+          <p>The song you listened to on Friday nights (between 5pm and 4am) is </p>
+          <p><!--You listened to this song for xxx minutes on Friday nights--></p>
+        </section>
+        <section id="most-times-in-a-row">
+          <p>The song you listened to the most in succession is </p>
+          <p><!--You listened to this song xxx times in a row--></p>
+        </section>
+        <section id="listen-everyday">
+          <p>The song you listened to every day is </p>
+          <p><!--You listened to this song for xxx days in a row--></p>
+        </section>
+        <section id="top-3-genres" class="number">
+          <p>Your top 3 genres are </p>
+        </section>
+      </div>
+    </main>
   </body>
 </html>
