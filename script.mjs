@@ -41,6 +41,7 @@ userDropdown.addEventListener("change", (e) => {
   countSongTimesFridayNight();
   topSongStreaks();
   listenEveryday();
+  topGenres();
 })
 
 const listenEvents = getListenEvents(activeUser);
@@ -310,9 +311,37 @@ function listenEveryday () {
 
   if (songEveryday.length !== 0) {
     songListenedToEveryday.innerHTML = 
-    `The song you listened to everyday <strong>${songEveryday}</strong>.`;
+    `The song you listened to everyday is <strong>${songEveryday}</strong>.`;
+  } else {
+    top3Genres.innerHTML = "";
   }
 
+}
+
+// function to determine top (3) genres
+function topGenres () {
+  const listenEvents = getListenEvents(activeUser);
+
+  let count = {};
+
+  listenEvents.forEach(event => {
+    const songID = event.song_id;
+    const songGenre = getSong(songID).genre;
+    count[songGenre] = (count[songGenre] || 0) + 1;
+  })
+
+  console.log(count);
+
+  const numberOfGenreListened = Object.keys(count).length;
+
+  console.log(numberOfGenreListened);
+
+  if (numberOfGenreListened === 1) {
+    top3Genres.innerHTML = 
+    `Your top genre is <strong>${Object.keys(count)}</strong>.`;
+  } else {
+    top3Genres.innerHTML = "";
+  }
 }
 
 // refactor
