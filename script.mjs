@@ -12,8 +12,6 @@ const mostListenedSongInARow = document.getElementById("most-times-in-a-row")
 const songListenedToEveryday = document.getElementById("listen-everyday")
 const top3Genres = document.getElementById("top-3-genres")
 
-// populating user dropdown
-
 // placeholder
 const placeholder = document.createElement("option");
 placeholder.value = "";
@@ -22,7 +20,7 @@ placeholder.selected = true;
 placeholder.disabled = true;
 userDropdown.appendChild(placeholder);
 
-// real users
+// populating user dropdown
 const userIDs = getUserIDs();
 userIDs.forEach(id => {
   const option = document.createElement("option");
@@ -35,15 +33,23 @@ userIDs.forEach(id => {
 // detect selected user & event listener for dropdown
 let activeUser = userDropdown.value;
 
+console.log(getListenEvents(activeUser));
+console.log(Array.isArray(getListenEvents(activeUser)));
+
+const userListenEvents = getListenEvents(activeUser);
+
 userDropdown.addEventListener("change", (e) => {
   activeUser = e.target.value;
   console.clear();
   countSongTimes();
   countArtistTimes();
   countSongTimesFridayNight();
+  topSongStreaks();
 })
 
-// function to determine top song by times listened
+const listenEvents = getListenEvents(activeUser);
+
+// function to determine top song by times & length listened
 function countSongTimes () {
   const listenEvents = getListenEvents(activeUser);
   let count = {};
@@ -100,7 +106,7 @@ function countSongTimes () {
   }
 }
 
-// function to determine top artist by times listened
+// function to determine top artist by times & length listened
 function countArtistTimes () {
   const listenEvents = getListenEvents(activeUser);
   let count = {};
@@ -157,7 +163,7 @@ function countArtistTimes () {
   }
 }
 
-// function to determine top song on Friday night by times listened
+// function to determine top song on Friday night by times & length listened
 function countSongTimesFridayNight () {
   const listenEvents = getListenEvents(activeUser);
   let count = {};
@@ -221,9 +227,66 @@ function countSongTimesFridayNight () {
   }
 }
 
-// function to determine top song by listening time
+// function to determine top song by consecutive listens
 
-// can the functions be combined somehow...? don't forget to add the friday
+function topSongStreaks() {
+  const listenEvents = getListenEvents(activeUser);
+  let count = {};
+  let currentSong = null;
+  let currentStreak = 0;
+
+  listenEvents.forEach(event => {
+    const songID = event.song_id;
+
+    if (songID === currentSong) {
+      currentStreak++;
+    } else {
+      if (currentSong !== null) {
+        count[currentSong] = Math.max(
+          count[currentSong] || 0,
+          currentStreak
+        );
+      }
+
+      // reset streak
+      currentSong = songID;
+      currentStreak = 1;
+    }
+  });
+
+  // handle last streak
+  if (currentSong !== null) {
+    count[currentSong] = Math.max(
+      count[currentSong] || 0,
+      currentStreak
+    );
+  }
+
+  console.log(count);
+  
+  // finding longest streak
+  let maxCountStreak = 0;
+  let topSongStreak = null;
+
+  for (let id in count) {
+    if (count[id] > maxCountStreak) {
+      maxCountStreak = count[id];
+      topSongStreak = id;
+    }
+  }
+
+  if (topSongStreak !== null) {
+    mostListenedSongInARow.innerHTML =
+    `The song you listened to the most in succession is <strong>${topSongStreak}</strong>. 
+    You listened to this song for <strong>${maxCountStreak} times</strong> in a row.`;
+  } else {
+    mostListenedSongInARow.innerHTML =
+    "No data available to display your top song listened in succession.";
+  }
+
+}
+
+// refactor
 // will it be efficient because they are supposed to be inputted in 2 different lines anyway? --> store values in different variables
 // edge test for null (no songs listened to in case of user 4) --> return 'you have no listening history'
 // make date, hour, day name global?
