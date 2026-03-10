@@ -33,11 +33,6 @@ userIDs.forEach(id => {
 // detect selected user & event listener for dropdown
 let activeUser = userDropdown.value;
 
-console.log(getListenEvents(activeUser));
-console.log(Array.isArray(getListenEvents(activeUser)));
-
-const userListenEvents = getListenEvents(activeUser);
-
 userDropdown.addEventListener("change", (e) => {
   activeUser = e.target.value;
   console.clear();
@@ -45,6 +40,7 @@ userDropdown.addEventListener("change", (e) => {
   countArtistTimes();
   countSongTimesFridayNight();
   topSongStreaks();
+  listenEveryday();
 })
 
 const listenEvents = getListenEvents(activeUser);
@@ -228,7 +224,6 @@ function countSongTimesFridayNight () {
 }
 
 // function to determine top song by consecutive listens
-
 function topSongStreaks() {
   const listenEvents = getListenEvents(activeUser);
   let count = {};
@@ -282,6 +277,40 @@ function topSongStreaks() {
   } else {
     mostListenedSongInARow.innerHTML =
     "No data available to display your top song listened in succession.";
+  }
+
+}
+
+// function to determine song user listened to everyday
+function listenEveryday () {
+  const listenEvents = getListenEvents(activeUser);
+  
+  // collect unique days user listened to music
+  const allDays = new Set();
+  const allDaysCount = allDays.size;
+  const songDays = {};
+
+  listenEvents.forEach(event => {
+    const day = new Date (event.timestamp).toISOString().slice(0,10);
+    allDays.add(day);
+
+     if (!songDays[event.song_id]) {
+        songDays[event.song_id] = new Set();
+    }
+
+    songDays[event.song_id].add(day);
+  })
+
+  console.log(allDays);
+  console.log(songDays);
+
+  const songEveryday = Object.entries(songDays).filter(([song, set]) => set.size === allDaysCount).map(([song, set]) => song);
+
+  console.log(songEveryday);
+
+  if (songEveryday.length !== 0) {
+    songListenedToEveryday.innerHTML = 
+    `The song you listened to everyday <strong>${songEveryday}</strong>.`;
   }
 
 }
