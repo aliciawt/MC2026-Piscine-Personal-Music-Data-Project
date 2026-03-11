@@ -257,7 +257,6 @@ function topGenres(songInfo) {
 }
 
 // update DOM with results
-
 function updateDOM(results) {
   const {
     topSong,
@@ -277,10 +276,10 @@ function updateDOM(results) {
     mostListenedSongByLength.style.display = "block";
 
     mostListenedSongByNumber.innerHTML =
-      `Your top song by number of times played is <strong>${topSong.byNumberOfListens}</strong>.`;
+      `Your top song by number of times played is <strong>${getSong(topSong.byNumberOfListens).title}</strong>.`;
 
     mostListenedSongByLength.innerHTML =
-      `Your top song by listening time is <strong>${topSong.byListeningTime}</strong>.`;
+      `Your top song by listening time is <strong>${getSong(topSong.byListeningTime).title}</strong>.`;
   }
 
   // top artist
@@ -298,7 +297,6 @@ function updateDOM(results) {
       `Your top artist by listening time is <strong>${topArtist.byListeningTime}</strong>.`;
   }  
 
-
   // friday night
   if (!topSongFriday.byNumberOfListens) {
     mostListenedSongByNumberFriday.style.display = "none";
@@ -308,10 +306,10 @@ function updateDOM(results) {
     mostListenedSongByLengthFriday.style.display = "block";
 
     mostListenedSongByNumberFriday.innerHTML =
-      `Your top Friday night song is <strong>${topSongFriday.byNumberOfListens}</strong>.`;
+      `Your top Friday night song by number of times played is <strong>${getSong(topSongFriday.byNumberOfListens).title}</strong>.`;
 
     mostListenedSongByLengthFriday.innerHTML =
-      `Your top Friday night song by listening time is <strong>${topSongFriday.byListeningTime}</strong>.`;
+      `Your top Friday night song by listening time is <strong>${getSong(topSongFriday.byListeningTime).title}</strong>.`;
   }
 
   // streak
@@ -321,7 +319,7 @@ function updateDOM(results) {
     mostListenedSongInARow.style.display = "block";
 
     mostListenedSongInARow.innerHTML =
-      `The song you listened to most in a row is <strong>${topStreak}</strong>.`;
+      `The song you listened to most in a row is <strong>${getSong(topStreak).title}</strong>.`;
   }
 
   // everyday
@@ -331,9 +329,8 @@ function updateDOM(results) {
     songListenedToEveryday.style.display = "block";
 
     songListenedToEveryday.innerHTML =
-      `The song you listened to everyday is <strong>${songEveryday.join(", ")}</strong>.`;
+      `The song you listened to everyday is <strong>${songEveryday.map(id => getSong(id).title).join(", ")}</strong>.`;
   }
-
 
   // top genres
   if (topGenres.length === 0) {
