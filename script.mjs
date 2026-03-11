@@ -42,7 +42,7 @@ userDropdown.addEventListener("change", (e) => {
   getTopSong(songInfo);
   getTopArtist(songInfo);
   fridayNightStats(songInfo);
-  topSongStreaks();
+  getTopStreak(songInfo);
   listenEveryday();
   topGenres();
 })
@@ -78,8 +78,8 @@ function getAllInfo () {
 // determine top song
 function getTopSong(songInfo) {
 
-  let countNumberOfListens = {};
-  let countListeningTime = {};
+  const countNumberOfListens = {};
+  const countListeningTime = {};
 
   let maxTimes = 0;
   let maxLength = 0;
@@ -115,8 +115,8 @@ function getTopSong(songInfo) {
 // determine top artist
 function getTopArtist(songInfo) {
 
-  let countNumberOfListens = {};
-  let countListeningTime = {};
+  const countNumberOfListens = {};
+  const countListeningTime = {};
 
   let maxTimes = 0;
   let maxLength = 0;
@@ -151,6 +151,7 @@ function getTopArtist(songInfo) {
 
 // friday night stats
 function fridayNightStats (songInfo) {
+  
   const fridayNightSongs = songInfo.filter(song => 
     (song.day === "Fri" && song.hour >= 17) || 
     (song.day === "Sat" && song.hour < 4)
@@ -163,126 +164,29 @@ function fridayNightStats (songInfo) {
   console.log(`TOP ARTIST FRIDAY NIGHT ${JSON.stringify(topArtistFriday)}`);
 }
 
-// function to determine top song on Friday night by times & length listened
-function countSongTimesFridayNight () {
-  const listenEvents = getListenEvents(activeUser);
-  let count = {};
-  let duration = {};
-  listenEvents.forEach(event => {
-    const songID = event.song_id;
-    const time = event.timestamp;
-    const date = new Date(time);
-    const hour = date.getHours();
-    const dayName = date.toString().slice(0,3);
-    if (dayName === "Fri" && hour >= 17 || dayName === "Sat" && hour < 4) {
-      const songDuration = getSong(songID).duration_seconds;
-      count[songID] = (count[songID] || 0) + 1;
-      duration[songID] = count[songID] * songDuration;
-    };
-  })
+// get top streak
 
-  console.log(count);
-  console.log(duration);
-
-  let maxCountTimes = 0;
-  let maxCountDuration = 0;
-  let maxCountDurationMinutes = 0;
-  let topSongTimesFriday = null;
-  let topSongDurationFriday = null;
-
-  for (let id in count) {
-    if (count[id] > maxCountTimes) {
-      maxCountTimes = count[id];
-      topSongTimesFriday = id;
-    }
-  }
-
-  for (let id in duration) {
-    if (duration[id] > maxCountDuration) {
-      maxCountDuration = duration[id];
-      topSongDurationFriday = id;
-    }
-  }
-
-  maxCountDurationMinutes = Math.floor(maxCountDuration / 60);
-  
-  if (topSongTimesFriday !== null) {
-    mostListenedSongByNumberFriday.innerHTML =
-    `The song you listened to the most on Friday nights (between 5pm and 4am) is <strong>${topSongTimesFriday}</strong>.
-    You listened to this song for <strong>${maxCountTimes} times</strong>.
-    You okay baby?`;
-  } else {
-    mostListenedSongByNumberFriday.innerHTML = 
-    "No data available to display your top song on Friday nights (between 5pm and 4am).";
-  }
-
-  if (topSongDurationFriday !== null) {
-    mostListenedSongByLengthFriday.innerHTML =
-    `The song you listened to the most on Friday nights (between 5pm and 4am) is <strong>${topSongDurationFriday}</strong>.
-    You listened to this song for more than <strong>${maxCountDurationMinutes} minutes</strong>!
-    You okay baby?`;
-  } else {
-    mostListenedSongByLengthFriday.innerHTML = 
-    "No data available to display your top song on Friday nights (between 5pm and 4am).";
-  }
-}
-
-// function to determine top song by consecutive listens
-function topSongStreaks() {
-  const listenEvents = getListenEvents(activeUser);
-  let count = {};
+function getTopStreak(songInfo) {
+  let topSong = null;
+  let maxStreak = 0;
   let currentSong = null;
   let currentStreak = 0;
 
-  listenEvents.forEach(event => {
-    const songID = event.song_id;
-
-    if (songID === currentSong) {
+  songInfo.forEach(song => {
+    if (song.songID === currentSong) {
       currentStreak++;
     } else {
-      if (currentSong !== null) {
-        count[currentSong] = Math.max(
-          count[currentSong] || 0,
-          currentStreak
-        );
-      }
-
-      // reset streak
-      currentSong = songID;
+      currentSong = song.songID;
       currentStreak = 1;
+    }
+
+    if (currentStreak > maxStreak) {
+      maxStreak = currentStreak;
+      topSong = currentSong;
     }
   });
 
-  // handle last streak
-  if (currentSong !== null) {
-    count[currentSong] = Math.max(
-      count[currentSong] || 0,
-      currentStreak
-    );
-  }
-
-  console.log(count);
-  
-  // finding longest streak
-  let maxCountStreak = 0;
-  let topSongStreak = null;
-
-  for (let id in count) {
-    if (count[id] > maxCountStreak) {
-      maxCountStreak = count[id];
-      topSongStreak = id;
-    }
-  }
-
-  if (topSongStreak !== null) {
-    mostListenedSongInARow.innerHTML =
-    `The song you listened to the most in succession is <strong>${topSongStreak}</strong>. 
-    You listened to this song for <strong>${maxCountStreak} times</strong> in a row.`;
-  } else {
-    mostListenedSongInARow.innerHTML =
-    "No data available to display your top song listened in succession.";
-  }
-
+  return topSong;
 }
 
 // function to determine song user listened to everyday
@@ -359,3 +263,4 @@ function topGenres () {
 // edge test for null (no songs listened to in case of user 4) --> return 'you have no listening history'
 // make date, hour, day name global?
 // separate functions: grab object data, determining top, and attaching to DOM?
+// edge case if there are 2 'tops'
