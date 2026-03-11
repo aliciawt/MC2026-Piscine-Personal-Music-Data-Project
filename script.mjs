@@ -40,7 +40,7 @@ userDropdown.addEventListener("change", (e) => {
   const songInfo = getAllInfo();
 
   getTopSong(songInfo);
-  countArtistTimes();
+  getTopArtist(songInfo);
   countSongTimesFridayNight();
   topSongStreaks();
   listenEveryday();
@@ -110,61 +110,41 @@ function getTopSong(songInfo) {
   return topSong;
 }
 
-// function to determine top artist by times & length listened
-function countArtistTimes () {
-  const listenEvents = getListenEvents(activeUser);
-  let count = {};
-  let duration = {};
-  listenEvents.forEach(event => {
-    const songID = event.song_id;
-    const songDuration = getSong(songID).duration_seconds;
-    const artist = getSong(songID).artist;
-    count[artist] = (count[artist] || 0) + 1; 
-    duration[artist] = (count[artist]) * songDuration;
-  })
+// determine top artist
+function getTopArtist(songInfo) {
 
-  console.log(count);
-  console.log(duration);
+  let countNumberOfListens = {};
+  let countListeningTime = {};
 
-  let maxCountTimes = 0;
-  let maxCountDuration = 0;
-  let maxCountDurationMinutes = 0;
-  let topArtistTimes = null;
-  let topArtistDuration = null;
+  let maxTimes = 0;
+  let maxLength = 0;
 
-  for (let id in count) {
-    if (count[id] > maxCountTimes) {
-      maxCountTimes = count[id];
-      topArtistTimes = id;
+  const topArtist = {};
+
+  songInfo.forEach(song => {
+    countNumberOfListens[song.artist] =
+      (countNumberOfListens[song.artist] || 0) + 1;
+
+    countListeningTime[song.artist] =
+      (countListeningTime[song.artist] || 0) + song.duration;
+
+    const times = countNumberOfListens[song.artist];
+    const length = countListeningTime[song.artist];
+
+    if (times > maxTimes) {
+      maxTimes = times;
+      topArtist.byNumberOfListens = song.artist;
     }
-  }
 
-  for (let id in duration) {
-    if (duration[id] > maxCountDuration) {
-      maxCountDuration = duration[id];
-      topArtistDuration = id;
+    if (length > maxLength) {
+      maxLength = length;
+      topArtist.byListeningTime = song.artist;
     }
-  }
 
-  maxCountDurationMinutes = Math.floor(maxCountDuration / 60);
-  
-  if (topArtistTimes !== null) {
-    mostListenedArtistByNumber.innerHTML =
-    `The artist you listened to the most is <strong>${topArtistTimes}</strong>. 
-    You listened to this artist <strong>${maxCountTimes} times</strong>.`;
-  } else {mostListenedArtistByNumber.innerHTML = 
-    "No data available to display your top artist.";
-  }
+  });
 
-  if (topArtistDuration !== null) {
-    mostListenedArtistByLength.innerHTML =
-    `The artist you listened to the longest is <strong>${topArtistDuration}</strong>. 
-    You listened to this artist for <strong>more than ${maxCountDurationMinutes} minutes</strong>!
-    Obsessed much?`;
-  } else {
-    mostListenedArtistByLength.innerHTML =
-    "No data available to display your top artist.";
-  }
+  console.log(`TOP ARTIST ${JSON.stringify(topArtist)}`);
+  return topArtist;
 }
 
 // function to determine top song on Friday night by times & length listened
