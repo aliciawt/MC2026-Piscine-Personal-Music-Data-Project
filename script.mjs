@@ -162,6 +162,8 @@ function fridayNightStats (songInfo) {
 
   const topArtistFriday = getTopArtist(fridayNightSongs);
   console.log(`TOP ARTIST FRIDAY NIGHT ${JSON.stringify(topArtistFriday)}`);
+
+  return { topSongFriday, topArtistFriday };
 }
 
 // get top streak
