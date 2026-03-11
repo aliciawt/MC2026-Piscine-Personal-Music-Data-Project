@@ -43,7 +43,7 @@ userDropdown.addEventListener("change", (e) => {
   getTopArtist(songInfo);
   fridayNightStats(songInfo);
   getTopStreak(songInfo);
-  listenEveryday();
+  listenEveryday(songInfo);
   topGenres();
 })
 
@@ -191,41 +191,32 @@ function getTopStreak(songInfo) {
   return topSong;
 }
 
-// function to determine song user listened to everyday
-function listenEveryday () {
-  const listenEvents = getListenEvents(activeUser);
-  
-  // collect unique days user listened to music
-  const allDays = new Set();
-  const songDays = {};
 
-  listenEvents.forEach(event => {
-    const day = new Date (event.timestamp).toISOString().slice(0,10);
-    allDays.add(day);
-
-     if (!songDays[event.song_id]) {
-        songDays[event.song_id] = new Set();
-    }
-
-    songDays[event.song_id].add(day);
-  })
-
-  const allDaysCount = allDays.size;
-
+// get song listened to everyday
+function listenEveryday(songInfo) {
+  // all unique dates user listened to any song
+  const allDays = new Set(songInfo.map(event => event.date));
   console.log(allDays);
-  console.log(songDays);
 
-  const songEveryday = Object.entries(songDays).filter(([song, set]) => set.size === allDaysCount).map(([song, set]) => song);
+  // map each song to a set of dates it was listened to
+  const songDays = songInfo.reduce((acc, event) => {
+    const songID = event.songID;
+
+    if (!acc[songID]) acc[songID] = new Set();
+    acc[songID].add(event.date);
+
+    return acc;
+  }, {});
+
+  const totalDays = allDays.size;
+
+  // songs listened to every day
+  const songEveryday = Object.entries(songDays)
+    .filter(([_, dates]) => dates.size === totalDays)
+    .map(([songID]) => songID);
 
   console.log(songEveryday);
-
-  if (songEveryday.length !== 0) {
-    songListenedToEveryday.innerHTML = 
-    `The song you listened to everyday is <strong>${songEveryday}</strong>.`;
-  } else {
-    songListenedToEveryday.innerHTML = "";
-  }
-
+  return songEveryday;
 }
 
 // function to determine top (3) genres
