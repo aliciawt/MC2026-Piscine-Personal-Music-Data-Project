@@ -49,6 +49,7 @@ userDropdown.addEventListener("change", (e) => {
 
 // get all listening info
 function getAllInfo () {
+  
   const listenEvents = getListenEvents(activeUser);
   const songInfo = [];
 
@@ -169,6 +170,7 @@ function fridayNightStats (songInfo) {
 // get top streak
 
 function getTopStreak(songInfo) {
+
   let topSong = null;
   let maxStreak = 0;
   let currentSong = null;
@@ -194,6 +196,7 @@ function getTopStreak(songInfo) {
 
 // get song listened to everyday
 function listenEveryday(songInfo) {
+
   // all unique dates user listened to any song
   const allDays = new Set(songInfo.map(event => event.date));
   console.log(allDays);
@@ -239,37 +242,6 @@ function topGenres(songInfo) {
   return topGenres;
 }
 
-// // function to determine top (3) genres
-// function topGenres () {
-//   const listenEvents = getListenEvents(activeUser);
-
-//   let count = {};
-
-//   listenEvents.forEach(event => {
-//     const songID = event.song_id;
-//     const songGenre = getSong(songID).genre;
-//     count[songGenre] = (count[songGenre] || 0) + 1;
-//   })
-
-
-//   count = Object.entries(count).sort((a, b) => b[1] - a[1]);
-//   console.log(count);
-
-//   const numberOfGenreListened = Object.keys(count).length;
-
-//   console.log(numberOfGenreListened);
-
-//   if (numberOfGenreListened === 1) {
-//     topGenresListenedTo.innerHTML = 
-//     `Your top genre is <strong>${(count[0])[0]}</strong>.`;
-//   } else if (numberOfGenreListened === 2) {
-//     topGenresListenedTo.innerHTML = 
-//     `Your top 2 genres are <strong>${(count[0])[0]}</strong> and <strong>${(count[1])[0]}</strong>.`;
-//   } else if (numberOfGenreListened > 2) {
-//     topGenresListenedTo.innerHTML = 
-//     `Your top 3 genres are <strong>${(count[0])[0]}</strong>, <strong>${(count[1])[0]}</strong>, and <strong>${(count[2])[0]}</strong>.`;
-//   }
-// }
 
 // refactor
 // will it be efficient because they are supposed to be inputted in 2 different lines anyway? --> store values in different variables
