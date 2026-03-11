@@ -10,7 +10,7 @@ const mostListenedArtistByLength = document.getElementById("most-listened-artist
 const mostListenedSongByLengthFriday = document.getElementById("most-listened-song-Friday-v2")
 const mostListenedSongInARow = document.getElementById("most-times-in-a-row")
 const songListenedToEveryday = document.getElementById("listen-everyday")
-const top3Genres = document.getElementById("top-3-genres")
+const topGenresListenedTo = document.getElementById("top-3-genres")
 
 // placeholder
 const placeholder = document.createElement("option");
@@ -313,7 +313,7 @@ function listenEveryday () {
     songListenedToEveryday.innerHTML = 
     `The song you listened to everyday is <strong>${songEveryday}</strong>.`;
   } else {
-    top3Genres.innerHTML = "";
+    songListenedToEveryday.innerHTML = "";
   }
 
 }
@@ -330,6 +330,8 @@ function topGenres () {
     count[songGenre] = (count[songGenre] || 0) + 1;
   })
 
+
+  count = Object.entries(count).sort((a, b) => b[1] - a[1]);
   console.log(count);
 
   const numberOfGenreListened = Object.keys(count).length;
@@ -337,10 +339,14 @@ function topGenres () {
   console.log(numberOfGenreListened);
 
   if (numberOfGenreListened === 1) {
-    top3Genres.innerHTML = 
-    `Your top genre is <strong>${Object.keys(count)}</strong>.`;
-  } else {
-    top3Genres.innerHTML = "";
+    topGenresListenedTo.innerHTML = 
+    `Your top genre is <strong>${(count[0])[0]}</strong>.`;
+  } else if (numberOfGenreListened === 2) {
+    topGenresListenedTo.innerHTML = 
+    `Your top 2 genres are <strong>${(count[0])[0]}</strong> and <strong>${(count[1])[0]}</strong>.`;
+  } else if (numberOfGenreListened > 2) {
+    topGenresListenedTo.innerHTML = 
+    `Your top 3 genres are <strong>${(count[0])[0]}</strong>, <strong>${(count[1])[0]}</strong>, and <strong>${(count[2])[0]}</strong>.`;
   }
 }
 
