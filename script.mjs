@@ -41,7 +41,7 @@ userDropdown.addEventListener("change", (e) => {
 
   getTopSong(songInfo);
   getTopArtist(songInfo);
-  countSongTimesFridayNight();
+  fridayNightStats(songInfo);
   topSongStreaks();
   listenEveryday();
   topGenres();
@@ -56,6 +56,7 @@ function getAllInfo () {
     const songID = event.song_id;
     const day = new Date(event.timestamp).toString().slice(0,3);
     const date = new Date(event.timestamp).toISOString().slice(0,10);
+    const hour = new Date(event.timestamp).getHours();
     const songArtist = getSong(songID).artist;
     const songDuration = getSong(songID).duration_seconds;
     const songGenre = getSong(songID).genre;
@@ -64,6 +65,7 @@ function getAllInfo () {
       songID,
       day,
       date,
+      hour,
       artist: songArtist,
       duration: songDuration,
       genre: songGenre
@@ -145,6 +147,20 @@ function getTopArtist(songInfo) {
 
   console.log(`TOP ARTIST ${JSON.stringify(topArtist)}`);
   return topArtist;
+}
+
+// friday night stats
+function fridayNightStats (songInfo) {
+  const fridayNightSongs = songInfo.filter(song => 
+    (song.day === "Fri" && song.hour >= 17) || 
+    (song.day === "Sat" && song.hour < 4)
+  );
+
+  const topSongFriday = getTopSong(fridayNightSongs);
+  console.log(`TOP SONG FRIDAY NIGHT ${JSON.stringify(topSongFriday)}`);
+
+  const topArtistFriday = getTopArtist(fridayNightSongs);
+  console.log(`TOP ARTIST FRIDAY NIGHT ${JSON.stringify(topArtistFriday)}`);
 }
 
 // function to determine top song on Friday night by times & length listened
