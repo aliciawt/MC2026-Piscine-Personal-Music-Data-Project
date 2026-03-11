@@ -2,6 +2,7 @@ import { getUserIDs, getSong, getListenEvents } from "./data.mjs";
 
 // grabbing DOM elements
 const userDropdown = document.getElementById("user-dropdown");
+const noData = document.getElementById("no-data")
 const mostListenedSongByNumber = document.getElementById("most-listened-song")
 const mostListenedArtistByNumber = document.getElementById("most-listened-artist")
 const mostListenedSongByNumberFriday = document.getElementById("most-listened-song-Friday")
@@ -39,13 +40,29 @@ userDropdown.addEventListener("change", (e) => {
 
   const songInfo = getAllInfo();
 
-  getTopSong(songInfo);
-  getTopArtist(songInfo);
-  fridayNightStats(songInfo);
-  getTopStreak(songInfo);
-  listenEveryday(songInfo);
-  topGenres(songInfo);
-})
+  if (songInfo.length === 0) {
+    noData.innerHTML = "You didn't listen to any songs!";
+    return;
+  }
+
+  noData.innerHTML = "";
+
+  const topSong = getTopSong(songInfo);
+  const topArtist = getTopArtist(songInfo);
+  const { topSongFriday } = fridayNightStats(songInfo);
+  const topStreak = getTopStreak(songInfo);
+  const songEveryday = listenEveryday(songInfo);
+  const topGenresArray = topGenres(songInfo);
+
+  updateDOM({
+    topSong,
+    topArtist,
+    topSongFriday,
+    topStreak,
+    songEveryday,
+    topGenres: topGenresArray
+  });
+});
 
 // get all listening info
 function getAllInfo () {
@@ -92,7 +109,7 @@ function getTopSong(songInfo) {
       (countNumberOfListens[song.songID] || 0) + 1;
 
     countListeningTime[song.songID] =
-      countNumberOfListens[song.songID] * song.duration;
+      (countListeningTime[song.songID] || 0) + song.duration;
 
     const times = countNumberOfListens[song.songID];
     const length = countListeningTime[song.songID];
@@ -161,10 +178,7 @@ function fridayNightStats (songInfo) {
   const topSongFriday = getTopSong(fridayNightSongs);
   console.log(`TOP SONG FRIDAY NIGHT ${JSON.stringify(topSongFriday)}`);
 
-  const topArtistFriday = getTopArtist(fridayNightSongs);
-  console.log(`TOP ARTIST FRIDAY NIGHT ${JSON.stringify(topArtistFriday)}`);
-
-  return { topSongFriday, topArtistFriday };
+  return { topSongFriday };
 }
 
 // get top streak
@@ -242,10 +256,102 @@ function topGenres(songInfo) {
   return topGenres;
 }
 
+// update DOM with results
 
-// refactor
-// will it be efficient because they are supposed to be inputted in 2 different lines anyway? --> store values in different variables
-// edge test for null (no songs listened to in case of user 4) --> return 'you have no listening history'
-// make date, hour, day name global?
-// separate functions: grab object data, determining top, and attaching to DOM?
-// edge case if there are 2 'tops'
+function updateDOM(results) {
+  const {
+    topSong,
+    topArtist,
+    topSongFriday,
+    topStreak,
+    songEveryday,
+    topGenres
+  } = results;
+
+  // top song
+  if (!topSong.byNumberOfListens) {
+    mostListenedSongByNumber.style.display = "none";
+    mostListenedSongByLength.style.display = "none";
+  } else {
+    mostListenedSongByNumber.style.display = "block";
+    mostListenedSongByLength.style.display = "block";
+
+    mostListenedSongByNumber.innerHTML =
+      `Your top song by number of times played is <strong>${topSong.byNumberOfListens}</strong>.`;
+
+    mostListenedSongByLength.innerHTML =
+      `Your top song by listening time is <strong>${topSong.byListeningTime}</strong>.`;
+  }
+
+  // top artist
+  if (!topArtist.byNumberOfListens) {
+    mostListenedArtistByNumber.style.display = "none";
+    mostListenedArtistByLength.style.display = "none";
+  } else {
+    mostListenedArtistByNumber.style.display = "block";
+    mostListenedArtistByLength.style.display = "block";
+
+    mostListenedArtistByNumber.innerHTML =
+      `Your top artist by number of times played is <strong>${topArtist.byNumberOfListens}</strong>.`;
+
+    mostListenedArtistByLength.innerHTML =
+      `Your top artist by listening time is <strong>${topArtist.byListeningTime}</strong>.`;
+  }  
+
+
+  // friday night
+  if (!topSongFriday.byNumberOfListens) {
+    mostListenedSongByNumberFriday.style.display = "none";
+    mostListenedSongByLengthFriday.style.display = "none";
+  } else {
+    mostListenedSongByNumberFriday.style.display = "block";
+    mostListenedSongByLengthFriday.style.display = "block";
+
+    mostListenedSongByNumberFriday.innerHTML =
+      `Your top Friday night song is <strong>${topSongFriday.byNumberOfListens}</strong>.`;
+
+    mostListenedSongByLengthFriday.innerHTML =
+      `Your top Friday night song by listening time is <strong>${topSongFriday.byListeningTime}</strong>.`;
+  }
+
+  // streak
+  if (!topStreak) {
+    mostListenedSongInARow.style.display = "none";
+  } else {
+    mostListenedSongInARow.style.display = "block";
+
+    mostListenedSongInARow.innerHTML =
+      `The song you listened to most in a row is <strong>${topStreak}</strong>.`;
+  }
+
+  // everyday
+  if (songEveryday.length === 0) {
+    songListenedToEveryday.style.display = "none";
+  } else {
+    songListenedToEveryday.style.display = "block";
+
+    songListenedToEveryday.innerHTML =
+      `The song you listened to everyday is <strong>${songEveryday.join(", ")}</strong>.`;
+  }
+
+
+  // top genres
+  if (topGenres.length === 0) {
+    topGenresListenedTo.style.display = "none";
+  } else {
+    topGenresListenedTo.style.display = "block";
+
+    let text;
+    if (topGenres.length === 1) {
+      text = `Your top genre is <strong>${topGenres[0]}</strong>.`;
+    } else if (topGenres.length === 2) {
+      text = `Your top 2 genres are <strong>${topGenres[0]}</strong> and <strong>${topGenres[1]}</strong>.`;
+    } else if (topGenres.length === 3) {
+      text = `Your top 3 genres are <strong>${topGenres[0]}</strong>, <strong>${topGenres[1]}</strong>, and <strong>${topGenres[2]}</strong>.`;
+    }
+
+    topGenresListenedTo.innerHTML = text;
+  }
+}
+
+// handle ties
