@@ -42,6 +42,17 @@ userDropdown.addEventListener("change", (e) => {
 
   if (songInfo.length === 0) {
     noData.innerHTML = "You didn't listen to any songs!";
+
+    mostListenedSongByNumber.style.display = "none";
+    mostListenedSongByLength.style.display = "none";
+    mostListenedArtistByNumber.style.display = "none";
+    mostListenedArtistByLength.style.display = "none";
+    mostListenedSongByNumberFriday.style.display = "none";
+    mostListenedSongByLengthFriday.style.display = "none";
+    mostListenedSongInARow.style.display = "none";
+    songListenedToEveryday.style.display = "none";
+    topGenresListenedTo.style.display = "none";
+
     return;
   }
 
@@ -232,6 +243,7 @@ function listenEveryday(songInfo) {
     .filter(([_, dates]) => dates.size === totalDays)
     .map(([songID]) => songID);
 
+  console.log(Object.entries(songDays));
   console.log(songEveryday);
   return songEveryday;
 }
