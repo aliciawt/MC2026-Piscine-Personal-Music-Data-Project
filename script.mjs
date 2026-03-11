@@ -44,7 +44,7 @@ userDropdown.addEventListener("change", (e) => {
   fridayNightStats(songInfo);
   getTopStreak(songInfo);
   listenEveryday(songInfo);
-  topGenres();
+  topGenres(songInfo);
 })
 
 // get all listening info
@@ -219,37 +219,57 @@ function listenEveryday(songInfo) {
   return songEveryday;
 }
 
-// function to determine top (3) genres
-function topGenres () {
-  const listenEvents = getListenEvents(activeUser);
+// get top genres
 
-  let count = {};
+function topGenres(songInfo) {
 
-  listenEvents.forEach(event => {
-    const songID = event.song_id;
-    const songGenre = getSong(songID).genre;
-    count[songGenre] = (count[songGenre] || 0) + 1;
-  })
+  const count = songInfo.reduce((acc, song) => {
+    const genre = song.genre;
+    acc[genre] = (acc[genre] || 0) + 1;
+    return acc;
+  }, {});
 
+  // convert to array and sort by count descending
+  const sortedGenres = Object.entries(count)
+    .sort((a, b) => b[1] - a[1]);
 
-  count = Object.entries(count).sort((a, b) => b[1] - a[1]);
-  console.log(count);
+  const topGenres = sortedGenres.slice(0, 3).map(([genre]) => genre);
 
-  const numberOfGenreListened = Object.keys(count).length;
-
-  console.log(numberOfGenreListened);
-
-  if (numberOfGenreListened === 1) {
-    topGenresListenedTo.innerHTML = 
-    `Your top genre is <strong>${(count[0])[0]}</strong>.`;
-  } else if (numberOfGenreListened === 2) {
-    topGenresListenedTo.innerHTML = 
-    `Your top 2 genres are <strong>${(count[0])[0]}</strong> and <strong>${(count[1])[0]}</strong>.`;
-  } else if (numberOfGenreListened > 2) {
-    topGenresListenedTo.innerHTML = 
-    `Your top 3 genres are <strong>${(count[0])[0]}</strong>, <strong>${(count[1])[0]}</strong>, and <strong>${(count[2])[0]}</strong>.`;
-  }
+  console.log(topGenres);
+  return topGenres;
 }
+
+// // function to determine top (3) genres
+// function topGenres () {
+//   const listenEvents = getListenEvents(activeUser);
+
+//   let count = {};
+
+//   listenEvents.forEach(event => {
+//     const songID = event.song_id;
+//     const songGenre = getSong(songID).genre;
+//     count[songGenre] = (count[songGenre] || 0) + 1;
+//   })
+
+
+//   count = Object.entries(count).sort((a, b) => b[1] - a[1]);
+//   console.log(count);
+
+//   const numberOfGenreListened = Object.keys(count).length;
+
+//   console.log(numberOfGenreListened);
+
+//   if (numberOfGenreListened === 1) {
+//     topGenresListenedTo.innerHTML = 
+//     `Your top genre is <strong>${(count[0])[0]}</strong>.`;
+//   } else if (numberOfGenreListened === 2) {
+//     topGenresListenedTo.innerHTML = 
+//     `Your top 2 genres are <strong>${(count[0])[0]}</strong> and <strong>${(count[1])[0]}</strong>.`;
+//   } else if (numberOfGenreListened > 2) {
+//     topGenresListenedTo.innerHTML = 
+//     `Your top 3 genres are <strong>${(count[0])[0]}</strong>, <strong>${(count[1])[0]}</strong>, and <strong>${(count[2])[0]}</strong>.`;
+//   }
+// }
 
 // refactor
 // will it be efficient because they are supposed to be inputted in 2 different lines anyway? --> store values in different variables
