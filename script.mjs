@@ -36,6 +36,7 @@ let activeUser = userDropdown.value;
 userDropdown.addEventListener("change", (e) => {
   activeUser = e.target.value;
   console.clear();
+  getAllInfo();
   countSongTimes();
   countArtistTimes();
   countSongTimesFridayNight();
@@ -44,7 +45,31 @@ userDropdown.addEventListener("change", (e) => {
   topGenres();
 })
 
-const listenEvents = getListenEvents(activeUser);
+// get all listening info
+function getAllInfo () {
+  const listenEvents = getListenEvents(activeUser);
+  const songInfo = [];
+
+  listenEvents.forEach(event => {
+    const songID = event.song_id;
+    const day = new Date(event.timestamp).toString().slice(0,3);
+    const date = new Date(event.timestamp).toISOString().slice(0,10);
+    const songArtist = getSong(songID).artist;
+    const songDuration = getSong(songID).duration_seconds;
+    const songGenre = getSong(songID).genre;
+
+    songInfo.push({
+      songID,
+      day,
+      date,
+      artist: songArtist,
+      duration: songDuration,
+      genre: songGenre
+    });
+  });
+  console.log(songInfo);
+}
+
 
 // function to determine top song by times & length listened
 function countSongTimes () {
@@ -288,7 +313,6 @@ function listenEveryday () {
   
   // collect unique days user listened to music
   const allDays = new Set();
-  const allDaysCount = allDays.size;
   const songDays = {};
 
   listenEvents.forEach(event => {
@@ -301,6 +325,8 @@ function listenEveryday () {
 
     songDays[event.song_id].add(day);
   })
+
+  const allDaysCount = allDays.size;
 
   console.log(allDays);
   console.log(songDays);
